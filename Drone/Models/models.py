@@ -28,7 +28,7 @@ class Drone(Base):
     weight_limit = Column(Float(500))
     battery_capacity = Column(Float(100))
     state = Column(String, nullable=False, default="IDLE")
-    medications = relationship("Medication", back_populates="owner")
+    medications = relationship("Medication", back_populates="drone")
 
 
 class Medication(Base):
