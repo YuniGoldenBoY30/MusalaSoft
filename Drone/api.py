@@ -3,7 +3,6 @@ from starlette.responses import RedirectResponse
 
 import models.models as create_model
 from routes.drone import router_drone
-
 from routes.medication import router_medication
 from schemas.database import engine
 
