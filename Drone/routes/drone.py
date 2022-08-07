@@ -1,14 +1,11 @@
-from uuid import uuid4 as uid
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-from fastapi import APIRouter
-
+from controllers import drones as drones_controller
+from schemas import drone as sch_drone, medication as sch_med
 from schemas.database import Sesionlocal
-from schemas.drone import Drone
 
 router_drone = APIRouter(prefix="/drone")
-
-drones_db = []
-medication_db = []
 
 
 # retorna la conexion con una sesion
@@ -20,34 +17,37 @@ def get_db():
         db.close()
 
 
-# @router_drone.get("/prueba")
-# async def pruebaProduct(db: Session = Depends(get_db)):
-#     return "success, in process Drone"
-
-#
-@router_drone.post("/create")
-def save_drone(drone: Drone):
+@router_drone.post("/create/", response_model=sch_drone.Drone)
+def create_drone(drone: sch_drone.Drone, db: Session = Depends(get_db)):
     """
-    * registering a drone;
-    * loading a drone with medication items;
+        * registering a drone
     """
-    drone.id = str(uid())
-    drones_db.append(drone.dict())
-    return drones_db
+    db_drone = drones_controller.get_drone_by_id(db, drone.id)
+    if db_drone:
+        raise HTTPException(status_code=404, detail="Drone already registered !")
+    return drones_controller.create_drone(db=db, drones=drone)
 
 
-@router_drone.get("/get-drone/{drone_id}")
-async def get_drone_by_id(drone_id):
+@router_drone.post("/create/{drone_id}/medications/", response_model=sch_med.Medication)
+def create_medications_for_drone(medications: sch_med.Medication, db: Session = Depends(get_db)):
+    """
+        * loading a drone with medication items
+    """
+    return drones_controller.create_drone_medications(db=db, medications=medications)
+
+
+@router_drone.get("/get-drone/{drone_id}/")
+async def get_drone_by_id(drone_id: int, db: Session = Depends(get_db)):
     """
         * Get all information about a given drone
     """
-    for drone in drones_db:
-        if drone["id"] == drone_id:
-            return {"drone": drone}
-        return "not found"
+    db_drone = drones_controller.get_drone_by_id(db, drone_id)
+    if not db_drone:
+        raise HTTPException(status_code=404, detail="Drone not found !")
+    return db_drone
 
 
-@router_drone.get("/loaded-medication/{drone_id}")
+@router_drone.get("/loaded-medication/{drone_id}/")
 async def check_loaded_medication(drone_id):
     """
         * checking loaded medication items for a given drone
@@ -55,7 +55,7 @@ async def check_loaded_medication(drone_id):
     return "check_loaded_medication"
 
 
-@router_drone.get("/availables-drones/")
+@router_drone.get("/available-drones/")
 async def check_available_drones():
     """
         * checking available drones for loading
@@ -63,27 +63,18 @@ async def check_available_drones():
     return "check_available_drones"
 
 
-@router_drone.get("/battery-level/{drone_id}")
+@router_drone.get("/battery-level/{drone_id}/")
 async def check_battery_level(drone_id):
     """
         * check drone battery level for a given drone
     """
-    for drone in drones_db:
-        if drone["id"] == drone_id:
-            return {"drone": drone["battery_capacity"]}
-        return "NOT FOUND DRONE"
+    return "NOT FOUND DRONE"
 
 
-@router_drone.get("/list")
-async def get_all_drone():
+@router_drone.get("/list/", response_model=list[sch_drone.Drone])
+async def get_all_drone(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
         * check all drone
     """
-    return drones_db
-
-#
-# @router_drone.post("/medication")
-# def save_medication(medication: Medication):
-#     medication.id = str(uid())
-#     medication_db.append(medication.dict())
-#     return medication_db
+    list_drones = drones_controller.get_all_drone(db, skip, limit)
+    return list_drones

@@ -20,3 +20,10 @@ def get_db():
 @router_medication.get("/med")
 async def pruebaMed(db: Session = Depends(get_db)):
     return "success, in process Med"
+
+#
+# @router_drone.post("/medication")
+# def save_medication(medication: Medication):
+#     medication.id = str(uid())
+#     medication_db.append(medication.dict())
+#     return medication_db
