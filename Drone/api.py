@@ -1,38 +1,23 @@
 from fastapi import FastAPI
-from Models.models import Drone, Medication
-from uuid import uuid4 as uid
+from starlette.responses import RedirectResponse
 
-app = FastAPI()
-drones_db = []
+import models.models as create_model
+from routes.drone import router_drone
+
+from routes.medication import router_medication
+from schemas.database import engine
+
+create_model.Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Api Drone",
+              description="simple rest-full api with sqlite",
+              version="1.0")
+
+app.include_router(router_drone)
+app.include_router(router_medication)
 
 
+# route index to redirect a documentation
 @app.get("/")
-async def root():
-    return {"message": "Stand up"}
-
-
-@app.get("/drone/{drone_id}")
-async def get_drone_by_id(drone_id):
-    for drone in drones_db:
-        if drone["id"] == drone_id:
-            return {"drone": drone}
-        return "not found"
-
-
-@app.get("/drones")
-async def get_all_drone():
-    return drones_db
-
-
-@app.post("/drone")
-def save_drone(drone: Drone):
-    drone.id = str(uid())
-    drones_db.append(drone.dict())
-    return drones_db
-
-
-@app.delete("/drone/{drones_id}")
-def delete_drone(drone: str):
-    for (k, v) in enumerate(drones_db):
-        print(k, v)
-    return "detelted"
+async def main():
+    return RedirectResponse(url="/docs/")
