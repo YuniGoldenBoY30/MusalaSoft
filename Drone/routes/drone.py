@@ -3,18 +3,9 @@ from sqlalchemy.orm import Session
 
 from controllers import drones as drones_controller
 from schemas import drone as sch_drone, medication as sch_med
-from schemas.database import Sesionlocal
+from schemas.database import get_db
 
 router_drone = APIRouter(prefix="/drone")
-
-
-# retorna la conexion con una sesion
-def get_db():
-    try:
-        db = Sesionlocal()
-        yield db
-    finally:
-        db.close()
 
 
 @router_drone.post("/create/", response_model=sch_drone.Drone)
@@ -40,7 +31,7 @@ async def create_medications_for_drone(medications: sch_med.Medication, db: Sess
 
 
 @router_drone.get("/get-drone/{drone_id}/", response_model=sch_drone.Drone)
-async def get_drone_by_id(drone_id: str, db: Session = Depends(get_db)):
+async def get_drone_by_id(drone_id: int, db: Session = Depends(get_db)):
     """
         * Get all information about a given drone
     """
@@ -51,7 +42,7 @@ async def get_drone_by_id(drone_id: str, db: Session = Depends(get_db)):
 
 
 @router_drone.get("/loaded-medication/{drone_id}/", )
-async def check_loaded_medication(drone_id: str, db: Session = Depends(get_db)):
+async def check_loaded_medication(drone_id: int, db: Session = Depends(get_db)):
     """
         * checking loaded medication items for a given drone
     """
@@ -71,7 +62,7 @@ async def check_available_drones(skip: int = 0, limit: int = 100, db: Session = 
 
 
 @router_drone.get("/battery-level/{drone_id}/")
-async def check_battery_level(drone_id: str, db: Session = Depends(get_db)):
+async def check_battery_level(drone_id: int, db: Session = Depends(get_db)):
     """
         * check drone battery level for a given drone
     """

@@ -1,9 +1,6 @@
-from uuid import uuid4 as uid
-
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-# from fastapi.encoders import jsonable_encoder
 from models import models
 from schemas import drone, medication
 
@@ -12,7 +9,7 @@ def get_all_drone(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Drone).offset(skip).limit(limit).all()
 
 
-def get_drone_by_id(db: Session, drone_id: str):
+def get_drone_by_id(db: Session, drone_id: int):
     try:
         return db.query(models.Drone).filter(models.Drone.id == drone_id).first()
     except Exception as e:
@@ -53,7 +50,7 @@ def create_drone_medications(db: Session, medications: medication.Medication):
     return db_medications
 
 
-def check_loaded_medication(drone_id: str, db: Session):
+def check_loaded_medication(drone_id: int, db: Session):
     try:
         list_medications = db.query(models.Drone).filter(models.Drone.id == drone_id).first().medications
         return {"detail": list_medications} if len(list_medications) > 0 else {"detail": "Drone empty !"}
@@ -65,7 +62,7 @@ def check_available_drones(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Drone).filter(models.Drone.state == "IDLE").offset(skip).limit(limit).all()
 
 
-def check_battery_level(drone_id: str, db: Session):
+def check_battery_level(drone_id: int, db: Session):
     try:
         data = db.query(models.Drone).filter(models.Drone.id == drone_id).first().battery_capacity
         return {"battery_capacity": data}

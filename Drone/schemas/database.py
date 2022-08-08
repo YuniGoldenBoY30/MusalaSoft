@@ -9,6 +9,15 @@ engine = create_engine(
 )
 
 # se crea la session para la serie de transaciones
-Sesionlocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+
+# retorna la conexion con una sesion
+def get_db():
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()

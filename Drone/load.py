@@ -3,9 +3,9 @@ import csv
 from sqlalchemy.exc import IntegrityError
 
 import models.models as model
-from schemas.database import Sesionlocal, engine
+from schemas.database import SessionLocal, engine
 
-db = Sesionlocal()
+db = SessionLocal()
 
 model.Base.metadata.create_all(bind=engine)
 try:
