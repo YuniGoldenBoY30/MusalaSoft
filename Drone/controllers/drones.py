@@ -19,6 +19,10 @@ def get_drone_by_id(db: Session, drone_id: int):
 def create_drone(db: Session, drones: drone.Drone):
     try:
         db_drones = models.Drone(**drones.dict())
+        if db_drones.weight_limit > 500:
+            db_drones.weight_limit = 500
+        if db_drones.battery_capacity > 100:
+            db_drones.battery_capacity = 100
         db.add(db_drones)
         db.commit()
         db.refresh(db_drones)
