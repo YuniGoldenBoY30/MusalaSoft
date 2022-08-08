@@ -18,7 +18,7 @@ def get_db():
 
 
 @router_drone.post("/create/", response_model=sch_drone.Drone)
-def create_drone(drone: sch_drone.Drone, db: Session = Depends(get_db)):
+async def create_drone(drone: sch_drone.Drone, db: Session = Depends(get_db)):
     """
         * registering a drone
     """
@@ -29,14 +29,14 @@ def create_drone(drone: sch_drone.Drone, db: Session = Depends(get_db)):
 
 
 @router_drone.post("/create/{drone_id}/medications/", response_model=sch_med.Medication)
-def create_medications_for_drone(medications: sch_med.Medication, db: Session = Depends(get_db)):
+async def create_medications_for_drone(medications: sch_med.Medication, db: Session = Depends(get_db)):
     """
         * loading a drone with medication items
     """
     return drones_controller.create_drone_medications(db=db, medications=medications)
 
 
-@router_drone.get("/get-drone/{drone_id}/")
+@router_drone.get("/get-drone/{drone_id}/", response_model=sch_drone.Drone)
 async def get_drone_by_id(drone_id: int, db: Session = Depends(get_db)):
     """
         * Get all information about a given drone
@@ -47,28 +47,35 @@ async def get_drone_by_id(drone_id: int, db: Session = Depends(get_db)):
     return db_drone
 
 
-@router_drone.get("/loaded-medication/{drone_id}/")
-async def check_loaded_medication(drone_id):
+@router_drone.get("/loaded-medication/{drone_id}/",)
+async def check_loaded_medication(drone_id: int, db: Session = Depends(get_db)):
     """
         * checking loaded medication items for a given drone
     """
-    return "check_loaded_medication"
+    load_medications = drones_controller.check_loaded_medication(db=db, drone_id=drone_id)
+    if load_medications is None:
+        raise HTTPException(status_code=404, detail="Drone not found !")
+    return load_medications
 
 
-@router_drone.get("/available-drones/")
-async def check_available_drones():
+@router_drone.get("/available-drones/", response_model=list[sch_drone.Drone])
+async def check_available_drones(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
         * checking available drones for loading
     """
-    return "check_available_drones"
+    list_drones = drones_controller.check_available_drones(db, skip, limit)
+    return list_drones
 
 
 @router_drone.get("/battery-level/{drone_id}/")
-async def check_battery_level(drone_id):
+async def check_battery_level(drone_id: int, db: Session = Depends(get_db)):
     """
         * check drone battery level for a given drone
     """
-    return "NOT FOUND DRONE"
+    db_drone = drones_controller.check_battery_level(db=db, drone_id=drone_id)
+    if db_drone is None:
+        raise HTTPException(status_code=404, detail="Drone not found !")
+    return db_drone
 
 
 @router_drone.get("/list/", response_model=list[sch_drone.Drone])

@@ -31,7 +31,7 @@ class Drone(BaseModel):
     weight_limit: float = Field(
         exclusiveMaximum=500
     )
-    battery_capacity: float
+    battery_capacity: float = 100.0
     state: State
     medications: list[Medication] = []
 
