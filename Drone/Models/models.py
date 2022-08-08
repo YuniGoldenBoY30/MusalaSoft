@@ -22,7 +22,7 @@ class State(str, Enum):
 
 class Drone(Base):
     __tablename__ = "drones"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column(String, primary_key=True, index=True)
     serial_number = Column(String(100), unique=True)
     model = Column(String, nullable=False, default="Lightweight")
     weight_limit = Column(Float(500))
@@ -38,5 +38,5 @@ class Medication(Base):
     weight = Column(Integer)
     code = Column(String(255))
     image = Column(String, nullable=True)
-    drone_id = Column(Integer, ForeignKey("drones.id"))
+    drone_id = Column(String, ForeignKey("drones.id"))
     drone = relationship("Drone", back_populates="medications")

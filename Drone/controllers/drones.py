@@ -34,6 +34,9 @@ def create_drone(db: Session, drones: drone.Drone):
 def create_drone_medications(db: Session, medications: medication.Medication):
     drone_medication = db.query(models.Drone).filter(models.Drone.id == medications.drone_id).first()
     capacity = drone_medication.weight_limit - medications.weight
+    if drone_medication.battery_capacity < 25:
+        raise HTTPException(status_code=404,
+                            detail=f"Low Battery at {drone_medication.battery_capacity}, please recharge")
     if capacity > 0:
         drone_medication.state = "LOADING"
     elif capacity == 0:
