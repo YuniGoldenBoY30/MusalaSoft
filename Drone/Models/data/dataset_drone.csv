@@ -1,0 +1,4 @@
+id;serial_number;model;weight_limit;battery_capacity;state;medications
+1;15;Lightweight;200;100;IDLE;
+2;16;Middleweight;250;100;IDLE;
+3;17;Cruiserweight;400;100;IDLE;

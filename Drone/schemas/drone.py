@@ -23,7 +23,7 @@ class State(str, Enum):
 
 
 class Drone(BaseModel):
-    id: Optional[str]
+    id: int
     serial_number: str = Field(
         min_length=0,
         max_length=100

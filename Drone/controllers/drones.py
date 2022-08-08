@@ -21,7 +21,6 @@ def get_drone_by_id(db: Session, drone_id: str):
 
 def create_drone(db: Session, drones: drone.Drone):
     try:
-        drones.id = str(uid())
         db_drones = models.Drone(**drones.dict())
         db.add(db_drones)
         db.commit()
