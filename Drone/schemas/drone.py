@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -22,7 +23,7 @@ class State(str, Enum):
 
 
 class Drone(BaseModel):
-    id: int
+    id: Optional[str]
     serial_number: str = Field(
         min_length=0,
         max_length=100

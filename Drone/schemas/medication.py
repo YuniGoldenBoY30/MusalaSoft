@@ -9,7 +9,7 @@ class Medication(BaseModel):
     weight: int
     code: str
     image: Optional[str]
-    drone_id: int
+    drone_id: str
 
     class Config:
         orm_mode = True
