@@ -47,7 +47,7 @@ async def main():
 if __name__ == "__main__":
     try:
         exec(open("load.py").read())
-        print("Server running well")
+        exec(open("logs/check_battery.py").read())
         uvicorn.run("api:app", host="0.0.0.0", port=8000, log_level="info")
     except Exception as e:
         print("FATAL ERROR")
